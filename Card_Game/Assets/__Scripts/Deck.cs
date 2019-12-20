@@ -18,10 +18,10 @@ public class Deck : MonoBehaviour
         xmlr.Parse(deckXMLText);
         //this prints a test line to show you how xmlr can be used
         string s = "xml[0] decorator[0]";
-        s += "type" + xmlr.xml["xml"][0]["decorator"][0].att("type");
+        s += "type=" + xmlr.xml["xml"][0]["decorator"][0].att("type");
         s += " x=" + xmlr.xml["xml"][0]["decorator"][0].att("x");
         s += " y=" + xmlr.xml["xml"][0]["decorator"][0].att("y");
-        s += " scale=" + xmlr.xml["xml"][0]["decorator"][0].att("scales");
+        s += " scale=" + xmlr.xml["xml"][0]["decorator"][0].att("scale");
         print(s);
     }
 }
