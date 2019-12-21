@@ -85,7 +85,12 @@ public class Deck : MonoBehaviour
                     cDef.pips.Add(deco);
                 }
             }
-            //face cards (Jack,Queen & King) have face attribute
+            //face cards (Jack,Queen & King) have a face attribute
+            if (xCardDefs[i].HasAtt("face"))
+            {
+                cDef.face = xCardDefs[i].att("face");
+            }
+            cardDefs.Add(cDef);
         }
     }
 
