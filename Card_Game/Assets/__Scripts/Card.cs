@@ -4,7 +4,18 @@ using UnityEngine;
 
 public class Card : MonoBehaviour
 {
-    //this class will be defined later
+    [Header("Set Dynamically")]
+    public string suit;//(C,D,H,or S)
+    public int rank;//(1-14)
+    public Color color = Color.black;//color to tint pips
+    public string colS = "Black";//or Red. Name thr color
+
+    //this list hold all of thre Decorator GameObjects
+    public List<GameObject> decoGOs = new List<GameObject>();
+    //this list holds all thr pip GameObject
+    public List<GameObject> pipGOs = new List<GameObject>();
+    public GameObject back;//the GameObject of the back of the card
+    public CardDefinition def;//parsed from DeckXML.xml
 }
 
 [System.Serializable]

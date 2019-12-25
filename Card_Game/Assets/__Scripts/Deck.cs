@@ -37,7 +37,25 @@ public class Deck : MonoBehaviour
     //InitDeck is called by prospector wwhen it is ready
     public void InitDeck(string deckXMLText)
     {
-        ReadDeck(deckXMLText);
+
+        //this creates an anchor for all the Card GameObjects in thr Hierarchy
+        if (GameObject.Find("_Deck") == null)
+        {
+            GameObject anchorGO = new GameObject("_Deck");
+            deckAnchor = anchorGO.transform;
+        }
+        //initialize the Dictionary of SuitSprites with necessary Sprites
+        dictSuits = new Dictionary<string, Sprite>()
+        {
+            {"c",suitClub},
+            {"D",suitDiamond },
+            {"H",suitHeart },
+            {"S", suitSpade }
+        };
+
+        ReadDeck(deckXMLText);//this will preexisting line from earlier
+                              //MakeCards();
+
     }
 
 
@@ -79,7 +97,7 @@ public class Deck : MonoBehaviour
         //read pip location for each card number 
         cardDefs = new List<CardDefinition>();
         PT_XMLHashList xCardDefs = xmlr.xml["xml"][0]["card"];
-        for(int i=0;i<xCardDefs.Count;i++)
+        for (int i = 0; i < xCardDefs.Count; i++)
         {
             CardDefinition cDef = new CardDefinition();
             //prase the attibute values and add them to cDef
@@ -113,5 +131,77 @@ public class Deck : MonoBehaviour
             cardDefs.Add(cDef);
         }
     }
+
+
+    //get the proper CardDefinition based on Rank(1 to 14)
+    public CardDefinition GetCardDefinitionByRank(int rnk)
+    {
+        //search through all of the CardDefinition
+        foreach (CardDefinition cd in cardDefs)
+        {
+            //if the rank is correct, return this definition
+            if (cd.rank == rnk)
+            {
+                return (cd);
+            }
+        }
+        return null;
+    }
+
+    //make the card GameObject
+    public void MakeCards()
+    {
+        //cardName will be the names of crds to build
+        //each suit goes from 1 to 14 (e.g., C1 to C4 for Clubs)
+        cardNames = new List<string>();
+        string[] letters = new string[] { "C", "D", "H", "S" };
+        foreach (string s in letters)
+        {
+            for (int i = 0; i < 13; i++)
+            {
+                cardNames.Add(s + (i + 1));
+            }
+        }
+        //make list to hold all  the cards
+        cards = new List<Card>();
+
+        //iterate through all of the card names that were just made
+        for (int i = 0; i < cardNames.Count; i++)
+        {
+            //makethe cards and add it to the cards Deck
+            cards.Add(MakeCard(i));
+        }
+    }
+
+
+    
+    private Card MakeCard(int cNum)
+    {
+        //create a new Card GameObject
+        GameObject cgo = Instantiate(prefabCard) as GameObject;
+        //set the transform.parent of the new card to the anchor
+        cgo.transform.parent = deckAnchor;
+        Card card = cgo.GetComponent<Card>();//get Card component
+        //this line stacks the cards so that they're all in nice rows
+        cgo.transform.localPosition = new Vector3((cNum % 13) * 3, cNum / 13 * 4, 0);
+
+        //assign basic values to the card
+        card.name = cardNames[cNum];
+        card.suit = card.name[0].ToString();
+        card.rank = int.Parse(card.name.Substring(1));
+        if (card.suit == "D" || card.suit == "H")
+        {
+            card.colS = "Red";
+            card.color = Color.red;
+        }
+
+        //pull the CardDefinition for this card
+        card.def = GetCardDefinitionByRank(card.rank);
+
+        //AddDecorators(card);
+
+        return card;
+    }
+
 
 }
