@@ -21,7 +21,7 @@ public class Deck : MonoBehaviour
 
     //prefab
     public GameObject prefabCard;
-    public GameObject preabSprite;
+    public GameObject prefabSprite;
 
 
     [Header("Set Dynamically")]
@@ -174,7 +174,7 @@ public class Deck : MonoBehaviour
     }
 
 
-    
+
     private Card MakeCard(int cNum)
     {
         //create a new Card GameObject
@@ -198,10 +198,48 @@ public class Deck : MonoBehaviour
         //pull the CardDefinition for this card
         card.def = GetCardDefinitionByRank(card.rank);
 
-        //AddDecorators(card);
+        AddDecorators(card);
 
         return card;
     }
+    //temporary veriables will be reused several times in helper methods
+    private Sprite _tSp = null;
+    private GameObject _tGO = null;
+    private SpriteRenderer _tSR = null;
 
+    private void AddDecorators(Card card)
+    {
+        //Add Decorators
+        foreach(Decorator deco in decorators)
+        {
+            if (deco.type == "suit")
+            {
+                //instantiate a Sprite GameObject
+                _tGO = Instantiate(prefabSprite) as GameObject;
+                //get the spriteRenderer Component
+                _tSR = _tGO.GetComponent<SpriteRenderer>();
+                //set the Srite to the proper suit
+                _tSR.sprite = dictSuits[card.suit];
+            }
+            else
+            {
+                _tGO = Instantiate(prefabSprite) as GameObject;
+                _tSR = _tGO.GetComponent<SpriteRenderer>();
+                //get the proper sprite to show this rank
+                _tSp = rankSprites[card.rank];
+                //assign this rank sprite to the SpriteRenderer
+                _tSR.sprite = _tSp;
+                //set the color of the rank to match the suit
+                _tSR.color = card.color;
+            }
+            //make the deco Sprites render above the Card
+            _tSR.sortingOrder = 1;
+            //make the decorator Sprites render above the Card
+            _tGO.transform.SetParent(card.transform);
+            //set the localPosition based pn the location from DeckXML
+            _tGO.transform.localPosition = deco.loc;
+            //flip the Decorator if needed
 
+        }
+    }
 }
