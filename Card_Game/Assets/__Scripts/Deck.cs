@@ -34,11 +34,10 @@ public class Deck : MonoBehaviour
     public Dictionary<string, Sprite> dictSuits;
 
 
-    //InitDeck is called by prospector wwhen it is ready
+    //InitDeck is called by prospector when it is ready
     public void InitDeck(string deckXMLText)
     {
-
-        //this creates an anchor for all the Card GameObjects in thr Hierarchy
+        //this creates an anchor for all the Card GameObjects in the Hierarchy
         if (GameObject.Find("_Deck") == null)
         {
             GameObject anchorGO = new GameObject("_Deck");
@@ -47,15 +46,14 @@ public class Deck : MonoBehaviour
         //initialize the Dictionary of SuitSprites with necessary Sprites
         dictSuits = new Dictionary<string, Sprite>()
         {
-            {"c",suitClub},
+            {"C",suitClub},
             {"D",suitDiamond },
             {"H",suitHeart },
             {"S", suitSpade }
         };
 
         ReadDeck(deckXMLText);//this will preexisting line from earlier
-                              //MakeCards();
-
+        MakeCards();
     }
 
 
@@ -93,6 +91,7 @@ public class Deck : MonoBehaviour
             //add temporary deco to the list Decorators
             decorators.Add(deco);
         }
+        
 
         //read pip location for each card number 
         cardDefs = new List<CardDefinition>();
@@ -183,8 +182,7 @@ public class Deck : MonoBehaviour
         cgo.transform.parent = deckAnchor;
         Card card = cgo.GetComponent<Card>();//get Card component
         //this line stacks the cards so that they're all in nice rows
-        cgo.transform.localPosition = new Vector3((cNum % 13) * 3, cNum / 13 * 4, 0);
-
+        cgo.transform.localPosition = new Vector3((cNum % 13)* 3, cNum /13*4, 0);
         //assign basic values to the card
         card.name = cardNames[cNum];
         card.suit = card.name[0].ToString();
@@ -197,7 +195,7 @@ public class Deck : MonoBehaviour
 
         //pull the CardDefinition for this card
         card.def = GetCardDefinitionByRank(card.rank);
-
+        
         AddDecorators(card);
 
         return card;
@@ -219,6 +217,7 @@ public class Deck : MonoBehaviour
                 //get the spriteRenderer Component
                 _tSR = _tGO.GetComponent<SpriteRenderer>();
                 //set the Srite to the proper suit
+                
                 _tSR.sprite = dictSuits[card.suit];
             }
             else
@@ -239,7 +238,20 @@ public class Deck : MonoBehaviour
             //set the localPosition based pn the location from DeckXML
             _tGO.transform.localPosition = deco.loc;
             //flip the Decorator if needed
-
+            if (deco.flip)
+            {
+                // an Euler rotation of 180 around the Z-axis will flip it
+                _tGO.transform.rotation = Quaternion.Euler(0, 0, 180);
+            }
+            //set the scale to keep deco from being too big
+            if (deco.scale != 1)
+            {
+                _tGO.transform.localScale = Vector3.one * deco.scale;
+            }
+            //name this GameObject so it's easy to see
+            _tGO.name = deco.type;
+            //add this deco GameObject to the List card.decoGOs
+            card.decoGOs.Add(_tGO);
         }
     }
 }

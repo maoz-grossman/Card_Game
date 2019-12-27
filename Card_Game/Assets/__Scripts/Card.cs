@@ -24,7 +24,7 @@ public class Card : MonoBehaviour
 public class Decorator
 {
     //this class srotes information about each decorator or pip from DeckXML
-    public string type; //for card pips, tye="pip"
+    public string type; //for card pips, type="pip"
     public Vector3 loc;//the location of the Sprite on the Card
     public bool flip = false;//whether to flip the Sprite vertically
     public float scale = 1f;//the scale of the Sprite
