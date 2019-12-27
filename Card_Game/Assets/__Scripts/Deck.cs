@@ -91,7 +91,7 @@ public class Deck : MonoBehaviour
             //add temporary deco to the list Decorators
             decorators.Add(deco);
         }
-        
+
 
         //read pip location for each card number 
         cardDefs = new List<CardDefinition>();
@@ -182,7 +182,7 @@ public class Deck : MonoBehaviour
         cgo.transform.parent = deckAnchor;
         Card card = cgo.GetComponent<Card>();//get Card component
         //this line stacks the cards so that they're all in nice rows
-        cgo.transform.localPosition = new Vector3((cNum % 13)* 3, cNum /13*4, 0);
+        cgo.transform.localPosition = new Vector3((cNum % 13) * 3, cNum / 13 * 4, 0);
         //assign basic values to the card
         card.name = cardNames[cNum];
         card.suit = card.name[0].ToString();
@@ -195,8 +195,10 @@ public class Deck : MonoBehaviour
 
         //pull the CardDefinition for this card
         card.def = GetCardDefinitionByRank(card.rank);
-        
+
         AddDecorators(card);
+        AddPips(card);
+        AddFace(card);
 
         return card;
     }
@@ -208,7 +210,7 @@ public class Deck : MonoBehaviour
     private void AddDecorators(Card card)
     {
         //Add Decorators
-        foreach(Decorator deco in decorators)
+        foreach (Decorator deco in decorators)
         {
             if (deco.type == "suit")
             {
@@ -217,7 +219,7 @@ public class Deck : MonoBehaviour
                 //get the spriteRenderer Component
                 _tSR = _tGO.GetComponent<SpriteRenderer>();
                 //set the Srite to the proper suit
-                
+
                 _tSR.sprite = dictSuits[card.suit];
             }
             else
@@ -253,5 +255,70 @@ public class Deck : MonoBehaviour
             //add this deco GameObject to the List card.decoGOs
             card.decoGOs.Add(_tGO);
         }
+    }
+
+    private void AddPips(Card card)
+    {
+        //for each of the pips in the definition..
+        foreach (Decorator pip in card.def.pips)
+        {
+            //instantiate a Sprite GameObject
+            _tGO = Instantiate(prefabSprite) as GameObject;
+            //set the parent to be the card GameObject
+            _tGO.transform.SetParent(card.transform);
+            //set the position to that specified in the XML
+            _tGO.transform.localPosition = pip.loc;
+            //flip it if necessary
+            if (pip.flip)
+            {
+                _tGO.transform.rotation = Quaternion.Euler(0, 0, 180);
+            }
+            //scale it necessary
+            if (pip.scale != 1)
+            {
+                _tGO.transform.localScale = Vector3.one * pip.scale;
+            }
+            //give it a name
+            _tGO.name = "pip";
+            //get the SpriteRenderer componenet
+            _tSR = _tGO.GetComponent<SpriteRenderer>();
+            //set the sprite to the proper suit
+            _tSR.sprite = dictSuits[card.suit];
+            //set storingOrder so the pip is rendered above the Card_Front
+            _tSR.sortingOrder = 1;
+            //Add this  to the Card's list of pips
+            card.pipGOs.Add(_tGO);
+        }
+    }
+
+    private void AddFace(Card card)
+    {
+        if (card.def.face == "")
+        {
+            return; //no need to run
+        }
+
+        _tGO = Instantiate(prefabSprite) as GameObject;
+        _tSR = _tGO.GetComponent<SpriteRenderer>();
+        //generate the right name annd pass it to GetFace()
+        _tSp = GetFace(card.def.face + card.suit);
+        _tSR.sprite = _tSp;
+        _tSR.sortingOrder = 1;
+        _tGO.transform.SetParent(card.transform);
+        _tGO.transform.localPosition = Vector3.zero;
+        _tGO.name = "face";
+    }
+
+    //Find the proper face card Sprite
+    private Sprite GetFace(string faceS)
+    {
+        foreach (Sprite _tSP in faceSprites)
+        {
+            if (_tSP.name == faceS)
+            {
+                return (_tSP);
+            }
+        }
+        return null;
     }
 }
