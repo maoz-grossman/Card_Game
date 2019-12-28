@@ -16,7 +16,21 @@ public class Card : MonoBehaviour
     public List<GameObject> pipGOs = new List<GameObject>();
     public GameObject back;//the GameObject of the back of the card
     public CardDefinition def;//parsed from DeckXML.xml
+    
+    public bool faceUp
+    {
+        get
+        {
+            return (!back.activeSelf);
+        }
+        set
+        {
+            back.SetActive(!value);
+        }
+    }
+
 }
+
 
 [System.Serializable]
 /* A Serializable class is able to be 
