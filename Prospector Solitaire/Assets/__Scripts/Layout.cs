@@ -46,7 +46,6 @@ public class Layout : MonoBehaviour
         SlotDef tSD;
         //slotsX is used as a shortcut to all the <slots>s
         PT_XMLHashList slotsX = xml["slot"];
-        print("slotsX count is: "+slotsX.Count);
         for (int i = 0; i < slotsX.Count; i++)
         {
             tSD = new SlotDef();
