@@ -88,6 +88,7 @@ public class Prospector : MonoBehaviour
             cp.SlotDef = tSD;
             //CrdProsperctor in the tableau have the state CardState.tableau
             cp.state = eCardState.tableau;
+            cp.SetSortingLayerName(tSD.layerName);//Set the sorting layers
             tableau.Add(cp);//Add this CradProspector to the List<> tableau 
         }
     }
