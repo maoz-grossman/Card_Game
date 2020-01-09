@@ -19,7 +19,7 @@ public class Card : MonoBehaviour
     //List of the SpriteRenderer Components of this GameObject
     public SpriteRenderer[] spriteRenderers;
 
-     void Start()
+    void Start()
     {
         SetSortOrder(0);
     }
@@ -28,7 +28,7 @@ public class Card : MonoBehaviour
     public void PopulateSpriteRenderers()
     {
         // If spriteRenderers is null or empty
-        if(spriteRenderers==null||spriteRenderers.Length==0)
+        if (spriteRenderers == null || spriteRenderers.Length == 0)
         {
             //Get SpriteRenderer Components of this GameObject and its children
             spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
@@ -51,7 +51,7 @@ public class Card : MonoBehaviour
         PopulateSpriteRenderers();
 
         //Iterate through all the spriteRenderers as tSR
-        foreach(SpriteRenderer tSR in spriteRenderers)
+        foreach (SpriteRenderer tSR in spriteRenderers)
         {
             //If the gmeObject is this.gameObject,it's the backgroud
             if (tSR.gameObject == this.gameObject)
@@ -59,9 +59,9 @@ public class Card : MonoBehaviour
                 tSR.sortingOrder = sOrd;//Set it's order to sOrd
                 continue;//And continue to the next iteration of the loop
             }
-           //Each of the children of this GameObject are named
-           //switch based on the names
-           switch(tSR.gameObject.name)
+            //Each of the children of this GameObject are named
+            //switch based on the names
+            switch (tSR.gameObject.name)
             {
                 case "back":
                     //Set it to the highest layer to cover the other sprites
@@ -88,6 +88,11 @@ public class Card : MonoBehaviour
         {
             back.SetActive(!value);
         }
+    }
+
+    virtual public void OnMouseUpAsButton()
+    {
+        print(name);//When clicked, this outputds the  card name
     }
 
 }

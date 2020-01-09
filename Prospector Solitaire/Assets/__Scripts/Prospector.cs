@@ -75,7 +75,7 @@ public class Prospector : MonoBehaviour
         }
         CardProspector cp;
         //Follow the layout
-        foreach(SlotDef tSD in layout.slotDefs)
+        foreach (SlotDef tSD in layout.slotDefs)
         {
             cp = Draw();
             cp.faceUp = tSD.faceUp;
@@ -91,5 +91,88 @@ public class Prospector : MonoBehaviour
             cp.SetSortingLayerName(tSD.layerName);//Set the sorting layers
             tableau.Add(cp);//Add this CradProspector to the List<> tableau 
         }
+        //Set up initial target card
+        MoveToTarget(Draw());
+
+        //Set up the Draw pile
+        UpdateDrawPile();
     }
+
+    //Move the current target to the dicard pile 
+    void MoveToDiscard(CardProspector cd)
+    {
+        //Change the state of the card to discard
+        cd.state = eCardState.discard;
+        discardPile.Add(cd);
+        cd.transform.parent = layoutAnchor;
+
+        //Position this card on the discardPile
+        cd.transform.localPosition = new Vector3(layout.multiplier.x * layout.discardPile.x, layout.multiplier.y * layout.discardPile.y, -layout.discardPile.LayerID + 0.5f);
+        cd.faceUp = true;
+        //Place it on top of the pile for deph sorting
+        cd.SetSortingLayerName(layout.discardPile.layerName);
+        cd.SetSortOrder(-100 + discardPile.Count);
+    }
+
+    //Make cd the new target card
+    void MoveToTarget(CardProspector cd)
+    {
+        //If there is currently a target card, move it to discard pile
+        if (target != null) MoveToDiscard(target);
+        target = cd;
+        cd.state = eCardState.target;
+        cd.transform.parent = layoutAnchor;
+        //Move to the target position 
+        cd.transform.localPosition = new Vector3(layout.multiplier.x * layout.discardPile.x, layout.multiplier.y * layout.discardPile.y, -layout.discardPile.LayerID);
+
+        cd.faceUp = true;//Make it faceUP
+        //Set the depth sorting
+        cd.SetSortingLayerName(layout.discardPile.layerName);
+        cd.SetSortOrder(0);
+    }
+
+    //Arrange all the cards of the draw pile to show how many are left
+    void UpdateDrawPile()
+    {
+        CardProspector cd;
+        for (int i = 0; i < drawPile.Count; i++)
+        {
+            cd = drawPile[i];
+            cd.transform.parent = layoutAnchor;
+
+            //Position it correctly with the layout.drawPile.stagger
+            Vector2 dpStagger = layout.drawPile.stagger;
+            cd.transform.localPosition = new Vector3(layout.multiplier.x * (layout.drawPile.x + i * dpStagger.x)
+                , layout.multiplier.y * (layout.drawPile.y + i * dpStagger.y)
+                , -layout.drawPile.LayerID + 0.1f * i);
+
+            cd.faceUp = false;//Make theme all face-down
+            cd.state = eCardState.drawpile;
+            //Set depth sorting
+            cd.SetSortingLayerName(layout.drawPile.layerName);
+            cd.SetSortOrder(-10 * i);
+        }
+    }
+
+    //CardClicked is called any time a card in the game is clicked
+    public void CardClicked(CardProspector cd)
+    {
+        //The reaction is determind the by state of the thhe clicked card
+        switch(cd.state)
+        {
+            case eCardState.target:
+                //Does nothing
+                break;
+            case eCardState.drawpile:
+                //Clicking any card in the drawPile will draw the next pile
+                MoveToDiscard(target);
+                MoveToTarget(Draw());
+                UpdateDrawPile();
+                break;
+            case eCardState.tableau:
+                //Will check if it valid play
+                break;
+        }
+    }
+
 }
