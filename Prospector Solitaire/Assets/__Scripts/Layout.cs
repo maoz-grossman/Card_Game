@@ -25,7 +25,7 @@ public class Layout : MonoBehaviour
     public PT_XMLHashtable xml;//This vairable is for faster xml access
     public Vector2 multiplier;//The offset of the tableau's center
     //SlotDef references
-    public List<SlotDef> slotDefs;
+    public List<SlotDef> slotDefs;//All the slotDefs for Row0-Row3
     public SlotDef drawPile;
     public SlotDef discardPile;
     //This holds all the possible names for the layers set by layerID
@@ -42,7 +42,7 @@ public class Layout : MonoBehaviour
         multiplier.x = float.Parse(xml["multiplier"][0].att("x"));
         multiplier.y = float.Parse(xml["multiplier"][0].att("y"));
 
-        //Read in slots
+        //Read in the slots
         SlotDef tSD;
         //slotsX is used as a shortcut to all the <slots>s
         PT_XMLHashList slotsX = xml["slot"];

@@ -69,7 +69,7 @@ public class Prospector : MonoBehaviour
         //Create an empty object to serve as an anchor for the tableau
         if (layoutAnchor == null)
         {
-            GameObject tGO = new GameObject("layoutAnchor");
+            GameObject tGO = new GameObject("_LayoutAnchor");
             layoutAnchor = tGO.transform;
             layoutAnchor.transform.position = layoutCenter;
         }
@@ -158,7 +158,7 @@ public class Prospector : MonoBehaviour
     public void CardClicked(CardProspector cd)
     {
         //The reaction is determind the by state of the thhe clicked card
-        switch(cd.state)
+        switch (cd.state)
         {
             case eCardState.target:
                 //Does nothing
@@ -170,9 +170,39 @@ public class Prospector : MonoBehaviour
                 UpdateDrawPile();
                 break;
             case eCardState.tableau:
-                //Will check if it valid play
+                bool validMatch = true;
+                if (!cd.faceUp)
+                {
+                    //If the card is face down
+                    validMatch = false;
+                }
+                if (!AdjacentRank(cd, target))
+                {
+                    //If it is not an adjacent rank, it is not valid
+                    validMatch = false;
+                }
+                if (!validMatch)
+                    return;
+
+                //If we got here, then:Yay! it's a valiid card
+                tableau.Remove(cd);//Remive it from the tableau List
+                MoveToTarget(cd);//Make it target card
+
                 break;
         }
+    }
+
+    //Return true if the two cards are adjacent in rank 
+    public bool AdjacentRank(CardProspector c0,CardProspector c1)
+    {
+        if (Mathf.Abs((c0.rank % 13) - (c1.rank % 13)) == 1)
+        {
+            return true;
+        }
+        //For the king and the queen
+        if ((c0.rank == 13 && c1.rank == 12) || (c0.rank == 12 && c1.rank == 13))
+            return true;
+        else return false;
     }
 
 }
