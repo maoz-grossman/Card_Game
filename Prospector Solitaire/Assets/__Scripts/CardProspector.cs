@@ -22,7 +22,7 @@ public class CardProspector : Card
     //The layoutID matches this card to the tableau card
     public int layoutID;
     //The SlotDef class stores information pulled in form the LayoutXML <slot>
-    public SlotDef SlotDef;
+    public SlotDef slotDef;
 
     //This allows the card to react to being clicked
     override public void OnMouseUpAsButton()

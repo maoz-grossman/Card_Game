@@ -85,17 +85,61 @@ public class Prospector : MonoBehaviour
             cp.transform.localPosition = new Vector3(layout.multiplier.x * tSD.x, layout.multiplier.y * tSD.y, -tSD.LayerID);
             //Set the localPosition of the card based on slotDef
             cp.layoutID = tSD.id;
-            cp.SlotDef = tSD;
+            cp.slotDef = tSD;
             //CrdProsperctor in the tableau have the state CardState.tableau
             cp.state = eCardState.tableau;
             cp.SetSortingLayerName(tSD.layerName);//Set the sorting layers
             tableau.Add(cp);//Add this CradProspector to the List<> tableau 
+        }
+
+        //Set which cards are hiding others
+        foreach (CardProspector tCP in tableau)
+        {
+            foreach (int hid in tCP.slotDef.hiddenBy)
+            {
+                cp = FindCardByLayoutID(hid);
+                tCP.hiddenBy.Add(cp);
+            }
         }
         //Set up initial target card
         MoveToTarget(Draw());
 
         //Set up the Draw pile
         UpdateDrawPile();
+    }
+
+
+    //Convert from layoutID int to the CardProspector with that ID
+    CardProspector FindCardByLayoutID(int layoutID)
+    {
+        foreach (CardProspector tCP in tableau)
+        {
+            //Search throught all cards in the tableau List<>
+            if (tCP.layoutID == layoutID)
+            {
+                return tCP;
+            }
+        }
+        //If it's not found, return null
+        return null;
+    }
+
+    //this turns cards in the mind face-up or down
+    void SetTableauFaces()
+    {
+        foreach(CardProspector cd in tableau)
+        {
+            bool faceUp = true;//Assume this card will be face-up
+            foreach (CardProspector cover in cd.hiddenBy)
+            {
+                //If either of the converting cards are in the tableau
+                if (cover.state == eCardState.tableau)
+                {
+                    faceUp = false;//then this card is face down
+                }
+            }
+            cd.faceUp = faceUp;//Set the value on this card
+        }
     }
 
     //Move the current target to the dicard pile 
@@ -187,10 +231,13 @@ public class Prospector : MonoBehaviour
                 //If we got here, then:Yay! it's a valiid card
                 tableau.Remove(cd);//Remive it from the tableau List
                 MoveToTarget(cd);//Make it target card
-
+                SetTableauFaces();//Update tableau card face-ups
                 break;
         }
     }
+
+
+
 
     //Return true if the two cards are adjacent in rank 
     public bool AdjacentRank(CardProspector c0,CardProspector c1)
