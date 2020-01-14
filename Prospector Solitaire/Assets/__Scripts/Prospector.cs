@@ -212,6 +212,7 @@ public class Prospector : MonoBehaviour
                 MoveToDiscard(target);
                 MoveToTarget(Draw());
                 UpdateDrawPile();
+                ScoreManager.EVENT(eScoreEvent.draw);
                 break;
             case eCardState.tableau:
                 bool validMatch = true;
@@ -232,6 +233,7 @@ public class Prospector : MonoBehaviour
                 tableau.Remove(cd);//Remive it from the tableau List
                 MoveToTarget(cd);//Make it target card
                 SetTableauFaces();//Update tableau card face-ups
+                ScoreManager.EVENT(eScoreEvent.mine);
                 break;
         }
 
@@ -253,22 +255,23 @@ public class Prospector : MonoBehaviour
         //if there are still cards in the draw pile, the game is not over
         if (drawPile.Count > 0)
         {
+            //print(drawPile.Count);
             return;
         }
 
 
-        ////Check for remaining valid playes
+        //Check for remaining valid playes
         //foreach (CardProspector cd in tableau)
         //{
         //    if (AdjacentRank(cd, target))
         //    {
-        //        return;//if there is a valid play, the game is not over
+        //       return;//if there is a valid play, the game is not over
         //    }
         //}
 
         //Since there are no valid palys, the game is over
         //Call GameOver() you lost
-        print(drawPile.Count);
+        
         GameOver(false);
     }
 
@@ -277,10 +280,12 @@ public class Prospector : MonoBehaviour
         if (won)
         {
             print("Game Over. You won!  :-)");
+            ScoreManager.EVENT(eScoreEvent.gameWin);
         }
         else
         {
             print("Game Over. you Lost! :-(");
+            ScoreManager.EVENT(eScoreEvent.gameLoss);
         }
 
         //Reload the scene, resetting the game/

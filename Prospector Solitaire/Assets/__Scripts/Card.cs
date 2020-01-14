@@ -92,7 +92,7 @@ public class Card : MonoBehaviour
 
     virtual public void OnMouseUpAsButton()
     {
-        print(name);//When clicked, this outputds the  card name
+        //print(name);//When clicked, this outputds the  card name
     }
 
 }
