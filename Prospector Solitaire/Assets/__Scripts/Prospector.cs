@@ -13,6 +13,10 @@ public class Prospector : MonoBehaviour
     public float xoffset = 3;
     public float yoffset = -2.5f;
     public Vector3 layoutCenter;
+    public Vector2 fsPosMid = new Vector2(0.5f, 0.90f);
+    public Vector2 fsPosRun = new Vector2(0.5f, 0.75f);
+    public Vector2 fsPosMid2 = new Vector2(0.4f, 1.0f);
+    public Vector2 fsPosEnd = new Vector2(0.5f, 0.95f);
 
     [Header("Set Dynamically")]
     public Deck deck;
@@ -22,12 +26,18 @@ public class Prospector : MonoBehaviour
     public CardProspector target;
     public List<CardProspector> tableau;
     public List<CardProspector> discardPile;
+    public FloatingScore fsRun;
+
+
     void Awake()
     {
         S = this;//set up a singleton for prospector    
     }
     void Start()
     {
+
+        Scoreboard.S.score = ScoreManager.SCORE;
+
         deck = GetComponent<Deck>();// get the Deck
         deck.InitDeck(deckXML.text);// pass DeckXML to it
         Deck.Shuffle(ref deck.cards);//this shuffles the deck by reference
@@ -127,10 +137,10 @@ public class Prospector : MonoBehaviour
     //this turns cards in the mind face-up or down
     void SetTableauFaces()
     {
-        foreach(CardProspector cd in tableau)
+        foreach (CardProspector cd in tableau)
         {
             bool faceUp = true;//Assume this card will be face-up
-            foreach (CardProspector cover in cd.hiddenBy)
+            foreach(CardProspector cover in cd.hiddenBy)
             {
                 //If either of the converting cards are in the tableau
                 if (cover.state == eCardState.tableau)
@@ -213,6 +223,7 @@ public class Prospector : MonoBehaviour
                 MoveToTarget(Draw());
                 UpdateDrawPile();
                 ScoreManager.EVENT(eScoreEvent.draw);
+                FloatingScoreHandler(eScoreEvent.draw);
                 break;
             case eCardState.tableau:
                 bool validMatch = true;
@@ -234,6 +245,7 @@ public class Prospector : MonoBehaviour
                 MoveToTarget(cd);//Make it target card
                 SetTableauFaces();//Update tableau card face-ups
                 ScoreManager.EVENT(eScoreEvent.mine);
+                FloatingScoreHandler(eScoreEvent.mine);
                 break;
         }
 
@@ -271,7 +283,7 @@ public class Prospector : MonoBehaviour
 
         //Since there are no valid palys, the game is over
         //Call GameOver() you lost
-        
+
         GameOver(false);
     }
 
@@ -281,11 +293,13 @@ public class Prospector : MonoBehaviour
         {
             print("Game Over. You won!  :-)");
             ScoreManager.EVENT(eScoreEvent.gameWin);
+            FloatingScoreHandler(eScoreEvent.gameWin);
         }
         else
         {
             print("Game Over. you Lost! :-(");
             ScoreManager.EVENT(eScoreEvent.gameLoss);
+            FloatingScoreHandler(eScoreEvent.gameLoss);
         }
 
         //Reload the scene, resetting the game/
@@ -294,7 +308,7 @@ public class Prospector : MonoBehaviour
 
 
     //Return true if the two cards are adjacent in rank 
-    public bool AdjacentRank(CardProspector c0,CardProspector c1)
+    public bool AdjacentRank(CardProspector c0, CardProspector c1)
     {
         if (Mathf.Abs((c0.rank % 13) - (c1.rank % 13)) == 1)
         {
@@ -304,6 +318,56 @@ public class Prospector : MonoBehaviour
         if ((c0.rank == 13 && c1.rank == 12) || (c0.rank == 12 && c1.rank == 13))
             return true;
         else return false;
+    }
+
+    //Handle FloatingScore movment
+    void FloatingScoreHandler(eScoreEvent evt)
+    {
+        List<Vector2> fsPts;
+        switch (evt)
+        {
+            case eScoreEvent.draw://Drawing a card
+            case eScoreEvent.gameWin://Won the round
+            case eScoreEvent.gameLoss://Lost the round
+                //Add fsRun to the scoreboard score
+                if (fsRun != null)
+                {
+                    //Create points for the bezier curve
+                    fsPts = new List<Vector2>();
+                    fsPts.Add(fsPosRun);
+                    fsPts.Add(fsPosMid2);
+                    fsPts.Add(fsPosEnd);
+                    fsRun.reportFinishTo = Scoreboard.S.gameObject;
+                    fsRun.init(fsPts, 0, 1);
+                    //Also adjust the fontSize
+                    fsRun.fontSizes = new List<float>(new float[] { 28, 36, 4 });
+                    fsRun = null; //Clear fsRun so it's created again
+                }
+                break;
+            case eScoreEvent.mine:
+                //Create a FloatingScore for this score
+                FloatingScore fs;
+                //Move it from the mousePosition to fsPosRun
+                Vector2 p0 = Input.mousePosition;
+                p0.x /= Screen.width;
+                p0.y /= Screen.height;
+                fsPts = new List<Vector2>();
+                fsPts.Add(p0);
+                fsPts.Add(fsPosMid);
+                fsPts.Add(fsPosRun);
+                fs = Scoreboard.S.CreateFloatingScore(ScoreManager.CHAIN, fsPts);
+                fs.fontSizes = new List<float>(new float[] { 4, 50, 28 });
+                if (fsRun == null)
+                {
+                    fsRun = fs;
+                    fsRun.reportFinishTo = null;
+                }
+                else
+                {
+                    fs.reportFinishTo = fsRun.gameObject;
+                }
+                break;
+        }
     }
 
 }

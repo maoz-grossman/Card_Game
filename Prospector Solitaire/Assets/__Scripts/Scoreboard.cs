@@ -28,7 +28,7 @@ public class Scoreboard : MonoBehaviour
         set
         {
             _score = value;
-            _scoreString = _score.ToString("NO");
+            _scoreString = _score.ToString();
         }
     }
 
@@ -42,6 +42,7 @@ public class Scoreboard : MonoBehaviour
         set
         {
             _scoreString = value;
+            print("What?? _scoreString is" + _scoreString);
             GetComponent<Text>().text = _scoreString;
         }
     }
@@ -63,6 +64,8 @@ public class Scoreboard : MonoBehaviour
     public void FScallback(FloatingScore fs)
     {
         score += fs.score;
+        S.GetComponent<Text>().text = _scoreString;
+        
     }
 
     //This will Insatiate a new FloatingScore GameObject and initialize it.

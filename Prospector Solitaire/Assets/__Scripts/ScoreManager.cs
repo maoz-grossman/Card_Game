@@ -28,11 +28,14 @@ public class ScoreManager : MonoBehaviour
     public int chain = 0;
     public int scoreRun = 0;
     public int score = 0;
+    
 
-    void Awake()
+    public void Awake()
     {
+        
         if (S == null)
         {
+            
             S = this;//Set the private singleton
         }
         else

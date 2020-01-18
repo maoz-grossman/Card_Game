@@ -30,7 +30,7 @@ public class FloatingScore : MonoBehaviour
         set
         {
             _score = value;
-            scoreString = _score.ToString("NO");//"NO" adds commas to the num
+            scoreString = _score.ToString();//"NO" adds commas to the num
             GetComponent<Text>().text = scoreString;
         }
     }
@@ -73,7 +73,7 @@ public class FloatingScore : MonoBehaviour
         state = eFSSstate.pre;
     }
 
-    public void FSCallback(FloatingScore fs)
+    public void FScallback(FloatingScore fs)
     {
         //When this callback is called by SendMessage,
         //add the score from the calling FloatungScore
@@ -97,7 +97,7 @@ public class FloatingScore : MonoBehaviour
             state = eFSSstate.pre;
             txt.enabled = false;//Hide the initially
         }
-        else;
+        else
         {
             if (u >= 1)
             {
@@ -109,7 +109,8 @@ public class FloatingScore : MonoBehaviour
                     //If there's a callback GameObjact 
                     //Use SendMessageto call the FScallback method
                     //with this parameter.
-                    reportFinishTo.SendMessage("FSCallback", this);
+                    reportFinishTo.SendMessage("FScallback", this);
+                    print("What should go out??");
                     //Now that the message has been sent
                     // Destroy this GameObject
                     Destroy(gameObject);
